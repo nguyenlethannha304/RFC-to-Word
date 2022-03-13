@@ -9,10 +9,10 @@ import string
 import re
 from docx import Document
 DIR_PATH = os.path.dirname(__file__)
-NORMAL_LINE = r'^(\s{3}(\S{2}|(\S\s\S)|(\|\s)))'
-TABLE_LINE = r'^(\s{3})((\+\|)|(-\S))'
+NORMAL_LINE = r'^(\s{3}(\S{2}|(\S\s\S)))'
+TABLE_LINE = r'^((\s{3})((\+-)|(\|\s)))'
 HEADING_LINE = r'^(\d\.)+'
-ORDER_LIST = r'^\s{3}((\d\.)|(o\s))'
+ORDER_LIST = r'^(\s{3}((\d\.)|(o\s)))'
 
 
 class ConvertRfcToWord:
@@ -90,22 +90,16 @@ class ConvertRfcToWord:
             self.pre_state = self.state
 
     def is_heading(self, text_item):
-        if re.match(HEADING_LINE, text_item):
-            return True
-        return False
+        return re.match(HEADING_LINE, text_item)
 
     def is_order_list(self, text_item):
-        if re.match(ORDER_LIST, text_item):
-            return True
-        return False
+        return re.match(ORDER_LIST, text_item)
 
     def is_table_line(self, text_item):
         return re.match(TABLE_LINE, text_item)
 
     def is_normal_line(self, text_item):
-        if re.match(NORMAL_LINE, text_item):
-            return True
-        return False
+        return re.match(NORMAL_LINE, text_item)
 
     def process_line(self, text_item):
         if self.state != self.pre_state:
@@ -113,7 +107,7 @@ class ConvertRfcToWord:
         if self.state == 'heading':
             self.process_heading(text_item)
         elif self.state == 'table_line':
-            self.process_line(text_item)
+            self.process_table_line(text_item)
         elif self.state == 'normal_line':
             self.process_normal_line(text_item)
         elif self.state == 'order_list':
@@ -165,5 +159,9 @@ class ConvertRfcToWord:
         self.current_paragraph.style = self.word_file.styles['List Paragraph']
 
 
+class Process:
+    pass
+
+
 if __name__ == "__main__":
-    ConvertRfcToWord('rfc.pdf', 6, 40)()
+    ConvertRfcToWord('rfc.pdf', 6, 47)()
